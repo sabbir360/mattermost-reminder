@@ -5,3 +5,5 @@ __pycache__
 .idea
 /api.json
 venv/
+cron_item/
+/*.tab
