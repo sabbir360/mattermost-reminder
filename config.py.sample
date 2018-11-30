@@ -1,0 +1,7 @@
+JIRA_URL = "https://jiraproject/browse/"
+MM_URL = "https://im.mattermost.com/"
+HOOK_ID = "nq6xxxxxha"
+USER_NAME = "JIRA"
+CHANNEL = "jira"
+USER_ICON = "https://previews.123rf.com/images/tabuday/tabuday1710/tabuday171000040/88075103-enso-open-circle-and-lettering-tao-buddhist-symbol-for-the-never-ending-journey-to-be-whole-handmade.jpg"
+DEBUG = False
