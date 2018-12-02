@@ -122,6 +122,7 @@ def reminder():
                         with open(file_path(), "w+") as f:
                             f.write(file_format)
                         remove(action_file)
+                        system("cat " + file_path() + " | crontab -")
                         reply['text'] = "File deleted as `"+command_parser[1]+"`"
                     else:
                         reply['text'] = "Make Sure File Name is Valid."
