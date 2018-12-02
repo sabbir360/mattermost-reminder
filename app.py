@@ -36,10 +36,13 @@ def mattermost_post(hook, channel, text, name, username):
             return "EX"
         text = quote_plus("\n".join(text.replace("\"", "").split("<br />")))
 
+        """
+           payload=%7B%22channel%22%3A%20%22random%22%2C%20%22text%22%3A%20%22%40channel%20%0A%0AExercise%20time%20boys%20and%20girls.%20%3Aman_cartwheeling%3A%20%3Arunning_man%3A%0AWish%20everyone%20participate%20willingly.%0A%22%2C%20%22username%22%3A%20%22TAO%22%7D
+        """
         base_text = "curl -X POST " + hook\
                     + " -H 'Content-Type: application/x-www-form-urlencoded' " \
                      "-H 'cache-control: no-cache' -d payload=%7B%22channel%22%3A%20%22"+\
-                    channel+"%22%2C%20%22text%22%3A%20%22"+ text +"%22%7D"
+                    channel+"%22%2C%20%22text%22%3A%20%22"+ text +"%0A%22%2C%20%22username%22%3A%20%22Reminder%22%7D"
         # base_text = base_text.replace("__channel__", channel).replace("__hook__", hook).replace("__MMTEXT__", text)
 
         f = open(file_name, "w")
