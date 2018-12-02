@@ -1,5 +1,5 @@
 from os.path import abspath, dirname, isfile
-from os import sep, system
+from os import sep, system, walk, remove
 from flask import Flask, request, jsonify
 from urllib.parse import quote_plus
 from re import split as re_sp
@@ -16,8 +16,11 @@ def file_path():
 
 def crontab_write(cp, cron_file):
     # write crontab
-    current_path = abspath(dirname(__file__)) + sep
-    f = open(file_path(), "w+")
+    if isfile(file_path()):
+        f = open(file_path(), "a+")
+    else:
+        f = open(file_path(), "w+")
+
     cron_text = cp[0] + " " + cp[1] + " * * " + cp[2] + " " + cron_file
     f.write(cron_text + " >/dev/null 2>&1")
     f.write("\n")
@@ -30,7 +33,7 @@ def mattermost_post(hook, channel, text, name, username):
         current_path = abspath(dirname(__file__)) + sep + "cron_item" + sep
         file_name = current_path + name + username + ".sh"
         if isfile(file_name):
-            return None
+            return "EX"
         text = quote_plus("\n".join(text.replace("\"", "").split("<br />")))
 
         base_text = "curl -X POST " + hook\
@@ -44,7 +47,7 @@ def mattermost_post(hook, channel, text, name, username):
         f.close()
         system("chmod +x "+file_name)
         return file_name
-    return None
+    return "IN"
 
 
 @app.route('/', methods=['POST'])
@@ -63,16 +66,62 @@ def reminder():
             if len(command_parser) == 6:  # add
                 cp = command_parser
                 resp = mattermost_post(HOOK, cp[3], cp[4], cp[5], username)
-                if resp:
+                # 0 MIN 1 HOUR 2 DAY 3 CHANNEL 4 TEXT 5 NAME
+                try:
+                    min_val = int(cp[0])
+                    hour_val = int(cp[1])
+                    day_val = int(cp[2].replace(",", ""))
+                    print(day_val)
+                except ValueError as ex:
+                    return jsonify({"text": str(ex)})
+                if min_val > 60 or min_val < 0:
+                    resp['text']= 'Invalid Minute Value'
+                elif hour_val > 24 or hour_val < 1:
+                    resp['text'] = 'Invalid Hour Value'
+                elif day_val > 1234567:
+                    reply['text'] = """Invalid Day Value. Value should be comma separated.\
+                     Example: 1 for Monday, 1,2 For Monday and Tuesday."""
+                elif resp == "EX":
+                    reply['text'] = "A reminder already set with this name."
+                elif resp == "IN":
+                    reply['text'] = "Invalid Reminder Name. Name should be AlphaNumeric."
+                elif resp:
                     crontab_write(cp, resp)
                     reply["text"] = 'Cron Set Successfully as `'+cp[5]+username+'`'
                 else:
-                    reply['text'] = "Make sure file name is **Valid and Unique**."
+                    reply['text'] = "Make sure Reminder name is **Valid, AplphaNumeric and Unique**."
 
             elif len(command_parser) == 1:
-                pass  # list
+                current_path = abspath(dirname(__file__))
+                reminder_list = []
+                for (dir_path, dir_name, file_names) in walk(current_path+sep+"cron_item"):
+                    for file_name in file_names:
+                        if username+".sh" in file_name:
+                            reminder_list.append(file_name.replace(username+".sh", ""))
+                items = ", ".join(reminder_list)
+                if items:
+                    reply['text'] = "**Your List:** "+items
+                else:
+                    reply['text'] = "You haven't added anything!"
             elif len(command_parser) == 2:
-                pass  # del
+                if command_parser[0] == "del":
+                    action_file = abspath(dirname(__file__))+sep+"cron_item"+sep+command_parser[1]+username+".sh"
+                    validation = re_match('^[a-zA-Z0-9_]+$', command_parser[1])
+                    if validation and isfile(action_file):
+                        print(action_file)
+                        new_file = []
+                        with open(file_path()) as f:
+                            lines = f.readlines()
+                            for line in lines:
+                                if action_file not in line:
+                                    new_file.append(line)
+                        file_format = "".join(new_file)
+                        with open(file_path(), "w+") as f:
+                            f.write(file_format)
+                        remove(action_file)
+                        reply['text'] = "File deleted as `"+command_parser[1]+"`"
+                    else:
+                        reply['text'] = "Make Sure File Name is Valid."
             else:
                 reply['text'] = "Invalid Command format"
         else:
