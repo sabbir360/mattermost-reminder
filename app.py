@@ -68,7 +68,7 @@ def reminder():
             print(command_parser)
             if len(command_parser) == 6:  # add
                 cp = command_parser
-                resp = mattermost_post(HOOK, cp[3], cp[4], cp[5], username)
+
                 # 0 MIN 1 HOUR 2 DAY 3 CHANNEL 4 TEXT 5 NAME
                 try:
                     min_val = int(cp[0])
@@ -76,7 +76,10 @@ def reminder():
                     day_val = int(cp[2].replace(",", ""))
                     print(day_val)
                 except ValueError as ex:
-                    return jsonify({"text": str(ex)})
+                    return jsonify({"text": "Check your format. Error: `"+str(ex)+"`"})
+
+                resp = mattermost_post(HOOK, cp[3], cp[4], cp[5], username)
+
                 if min_val > 60 or min_val < 0:
                     resp['text']= 'Invalid Minute Value'
                 elif hour_val > 24 or hour_val < 1:
@@ -123,7 +126,7 @@ def reminder():
                             f.write(file_format)
                         remove(action_file)
                         system("cat " + file_path() + " | crontab -")
-                        reply['text'] = "File deleted as `"+command_parser[1]+"`"
+                        reply['text'] = "Reminder deleted as `"+command_parser[1]+"`"
                     else:
                         reply['text'] = "Make Sure File Name is Valid."
             else:
