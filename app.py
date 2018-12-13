@@ -21,6 +21,7 @@ def crontab_write(cp, cron_file):
     if isfile(file_path()):
         f = open(file_path(), "a+")
     else:
+        # keep existing crontab data.
         crontab_data = subprocess.run(['crontab', '-l'], stdout=subprocess.PIPE).stdout.decode('utf-8')
         f = open(file_path(), "w+")
 
