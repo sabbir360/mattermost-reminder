@@ -136,7 +136,7 @@ def reminder():
                 if items:
                     reply['text'] = "**Your List:** \n"+items
                     if other_items and username in ADMIN_USER:
-                        reply['text'] = reply['text']+"Other users reminders.\n**Type `del_others ReminderName` to delete.**\n"+other_items
+                        reply['text'] = reply['text']+"\n\nOther users reminders.\n**Type `del_others ReminderName` to delete.**\n"+other_items
 
                 else:
                     reply['text'] = response_rectifier("You haven't added anything!")
