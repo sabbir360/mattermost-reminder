@@ -129,7 +129,8 @@ def reminder():
                         if username+".sh" in file_name:
                             reminder_list.append(file_name.replace(username+".sh", ""))
                         else:
-                            reminder_list_admin.append(file_name)
+                            if file_name != ".gitkeep":
+                                reminder_list_admin.append(file_name)
                 items = "\n".join(reminder_list)
                 other_items = "\n".join(reminder_list_admin)
                 if items:
