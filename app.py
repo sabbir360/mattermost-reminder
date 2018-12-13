@@ -118,7 +118,7 @@ def reminder():
                 if command_parser[0] == "help":
                     admin_hint = ""
                     if username in ADMIN_USER:
-                        admin_hint = "To delete others reminder type `/reminder del_others ReminderName`\n"
+                        admin_hint = "To delete others reminder type (Admin only) `/reminder del_others ReminderName`\n"
                     reply['text'] = response_rectifier(admin_hint, "help")
                     return jsonify(reply)
                 current_path = abspath(dirname(__file__))
@@ -136,7 +136,7 @@ def reminder():
                 if items:
                     reply['text'] = "**Your List:** \n"+items
                     if other_items and username in ADMIN_USER:
-                        reply['text'] = reply['text']+"\n\n**Other users reminders.**\n**Type `del_others ReminderName` to delete.**\n"+other_items
+                        reply['text'] = reply['text']+"\n\n**Other users reminders (Only Admin Can See)**\n**Type `/reminder del_others ReminderName` to delete.**\n"+other_items
 
                 else:
                     reply['text'] = response_rectifier("You haven't added anything!")
