@@ -110,7 +110,7 @@ def reminder():
                     reply['text'] = "Invalid Reminder Name. Name should be AlphaNumeric."
                 elif resp:
                     crontab_write(cp, resp)
-                    reply["text"] = 'Cron Set Successfully as `'+cp[5]+'`'
+                    reply["text"] = 'Reminder Set Successfully as `'+cp[5]+'`'
                 else:
                     reply['text'] = response_rectifier("Make sure Reminder name is **Valid, AplphaNumeric and Unique**.")
 
